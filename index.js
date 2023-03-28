@@ -1,11 +1,17 @@
 const mqtt = require('mqtt');
 const { WebSocketServer } = require('ws');
-const host = '192.168.0.27'
-const port = '1883'
-const clientId = `mqtt_${Math.random().toString(16).slice(3)}`
+const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
 
-const connectUrl = `mqtt://${host}:${port}`;
-const sockserver = new WebSocketServer({ port: 5502 });
+const WEBSOCKET_PORT = parseInt(process.env.WEBSOCKET_PORT) || 5502;
+const MQTT_HOST = process.env.MQTT_HOST || "192.168.0.27";
+const MQTT_PORT = process.env.MQTT_PORT || "1883";
+
+console.log(`Websocket Port: ${WEBSOCKET_PORT}`);
+console.log(`Mqtt Host: ${MQTT_HOST}`);
+console.log(`Mqtt Port: ${MQTT_PORT}`);
+
+const connectUrl = `mqtt://${MQTT_HOST}:${MQTT_PORT}`;
+const sockserver = new WebSocketServer({ port: WEBSOCKET_PORT });
 
 const client = mqtt.connect(connectUrl, {
   clientId,
@@ -14,7 +20,7 @@ const client = mqtt.connect(connectUrl, {
   username: 'emqx',
   password: 'public',
   reconnectPeriod: 1000,
-})
+});
 
 const topic = 'inTopic';
 const topic2 = "outTopic";
@@ -24,24 +30,24 @@ function toggle() {
     on = !on;
     client.publish(topic, on ? '1' : "0", { qos: 0, retain: false }, (error) => {
         if (error) {
-          console.error(error)
+          console.error(error);
         }
     })
 }
 
 client.on('connect', () => {
-  console.log('Connected')
+  console.log('Connected');
   client.subscribe([topic, topic2], () => {
-    console.log(`Subscribe to topic '${topic}'`)
-  })
-})
+    console.log(`Subscribe to topic '${topic}'`);
+  });
+});
 
 client.on('message', (_topic, payload) => {
     const data = payload.toString();
     console.log(data);
     if (data.includes("hello world")) {
         sockserver.clients.forEach(client => {
-            console.log(`distributing message: ${data}`)
+            console.log(`distributing message: ${data}`);
             client.send(data);
         });
     }
@@ -55,12 +61,12 @@ client.on('message', (_topic, payload) => {
     }
 
     console.log(jsonData);
-})
+});
 
 sockserver.on('connection', ws => {
-    console.log('New client connected!')
-    ws.send('connection established')
-    ws.on('close', () => console.log('Client has disconnected!'))
+    console.log('New client connected!');
+    ws.send('connection established');
+    ws.on('close', () => console.log('Client has disconnected!'));
     ws.on('message', data => {
         console.log(data.toString());
         if (data.toString() === "toggle") {
@@ -72,6 +78,6 @@ sockserver.on('connection', ws => {
     //   });
     })
     ws.onerror = function () {
-      console.log('websocket error')
+      console.log('websocket error');
     }
 })
