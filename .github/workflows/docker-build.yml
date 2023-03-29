@@ -10,7 +10,6 @@ jobs:
   test_pull_request:
     runs-on: ubuntu-latest
     steps:
-      - name: "Running unit tests."
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
