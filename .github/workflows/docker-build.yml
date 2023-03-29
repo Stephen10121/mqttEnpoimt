@@ -1,0 +1,21 @@
+name: docker-build
+
+on:
+  push:
+    branches: [ master ]
+  pull_requests:
+    branches: [ master ]
+
+jobs:
+  build_container:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v1
+
+    - name: Build the Docker image
+
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "stephen10121" --password-stdin
+        docker buildx build --platform=linux/amd64,linux/arm64 --push -t stephen10121/mqttendpoint:1.0.3 .
