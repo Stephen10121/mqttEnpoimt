@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ release ]
 
+jobs:
   build_container:
     runs-on: ubuntu-latest
 
