@@ -6,6 +6,8 @@ const WEBSOCKET_PORT = parseInt(process.env.WEBSOCKET_PORT) || 5502;
 const MQTT_HOST = process.env.MQTT_HOST || "192.168.0.27";
 const MQTT_PORT = process.env.MQTT_PORT || "1883";
 
+console.log("Welcome");
+
 console.log(`Websocket Port: ${WEBSOCKET_PORT}`);
 console.log(`Mqtt Host: ${MQTT_HOST}`);
 console.log(`Mqtt Port: ${MQTT_PORT}`);
